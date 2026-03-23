@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>王涛涛-UI设计师简历首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        .accordion-container {
+            display: flex;
+            width: 100%;
+            height: 100vh;
+            gap: 0; /* 模块无间距 */
+        }
+        .accordion-item {
+            flex: 1;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transition: flex 0.8s ease;
+            cursor: pointer;
+            overflow: hidden;
+            min-width: 0;
+        }
+        /* ========== 水印样式 ========== */
+        .watermark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* 不影响鼠标交互 */
+            z-index: 2; /* 水印在背景图上，遮罩/文字下 */
+            /* 水印文字样式 */
+            font-size: 30px;
+            color: rgba(255, 255, 255, 0.2);
+            font-weight: bold;
+            text-align: center;
+            line-height: 100px;
+            transform: rotate(-45deg); /* 旋转45度 */
+            /* 平铺水印 */
+            background-image: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 50px,
+                rgba(255, 255, 255, 0.1) 50px,
+                rgba(255, 255, 255, 0.1) 100px
+            );
+        }
+        /* 水印文字内容（通过伪元素生成） */
+        .watermark::after {
+            content: "你的水印文字"; /* 替换为你的水印内容 */
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            white-space: nowrap;
+            letter-spacing: 5px;
+        }
+        @keyframes itemSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        .accordion-item:hover {
+            flex: 3;
+        }
+
+        /* 默认状态色块样式 */
+        .blue-block {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            height: 600px;
+            background-color: #00143b;
+            opacity: 0.6;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            transition: all 0.8s ease;
+        }
+
+        /* 替换Font Awesome的纯CSS图标样式 */
+        .item-icon {
+            font-size: 60px;
+            color: #fff;
+            margin-bottom: 30px;
+            transition: all 0.8s ease;
+            /* 用CSS实现图标，无需外网字体 */
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+         /* ========== 核心修改：图片图标样式 ========== */
+         .item-icon {
+            /* 保持原有尺寸和布局，适配图片显示 */
+            width: 80px;
+            height: 80px;
+            margin-bottom: 30px;
+            transition: all 0.8s ease;
+            z-index: 3;
+            /* 图片居中且不变形 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* 图标图片样式：填充容器且不变形 */
+        .item-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* 保持图片比例，不拉伸 */
+        }
+
+        .item-title {
+            font-size: 32px;
+            color: #fff;
+            color: rgba(255, 255, 255, 1);
+            font-weight: bold;
+            letter-spacing: 4px;
+            transition: all 0.8s ease;
+            z-index: 3; 
+        }
+        
+        .item-desc {
+            font-size: 14px;
+            color: #ffffff;
+            color: rgba(255, 255, 255, 1);
+            height: 30PX;
+            line-height: 1.6;
+            text-align: left;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            z-index: 3; 
+        }
+        .item-desc b{font-size: 18px;}
+
+        /* 鼠标悬停时的样式 */
+        .accordion-item:hover .blue-block {
+            top: auto;
+            bottom:0;
+            left: 0;
+            transform: none;
+            width: 100%;
+            height: 260px;
+            /* 渐变遮罩保留，确保文字在遮罩上显示 */
+            background: linear-gradient(to bottom, rgba(0, 44, 118, 0), rgba(0, 17, 50, 0.9));
+            /* 关键：调整内边距，让文字远离底部边缘 */
+            padding: 30px 30px 20px;
+            /* 内容靠上对齐，避免被底部遮挡 */
+            justify-content: flex-start;
+            align-items: flex-start;
+            /* 确保遮罩在背景图上，文字在遮罩上 */
+            z-index: 1;
+        }
+        .accordion-item:hover .item-icon {
+            opacity: 0;
+            margin-bottom: 0;
+        }
+        .accordion-item:hover .item-title {
+            font-size: 28px;
+            letter-spacing: 2px;
+            text-align: left;
+            margin-bottom: 12px;
+        }
+        .accordion-item:hover .item-desc {
+            opacity: 1;
+            z-index: 3;
+        }
+
+        /* 背景图 */
+        .item1 {background-image: url(./xg/bg1.jpg);}
+        .item2 {background-image: url(./xg/bg2.jpg);}
+        .item3 {background-image: url(./xg/bg3.jpg);}
+        .item4 {background-image: url(./xg/bg4.jpg);}
+        .item5 {background-image: url(./xg/bg5.jpg);}
+
+        /* 自适应调整 */
+        @media (max-width: 768px) {
+            .blue-block {
+                height: 300px;
+            }
+            .item-icon {
+                font-size: 40px;
+            }
+            .icon-mountain::before,
+            .icon-lake::before,
+            .icon-tree::before,
+            .icon-cloud::before,
+            .icon-star::before {
+                font-size: 40px;
+            }
+            .item-title {
+                font-size: 20px;
+            }
+            .accordion-item:hover .blue-block {
+                height: 180px;
+                padding: 20px;
+            }
+            .accordion-item:hover .item-title {
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+            .item-desc {
+                font-size: 12px;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="accordion-container">
+            <!-- 模块1-->
+            <div class="accordion-item item1" onclick="window.location.href='PersonalProfile.html'">
+                <div class="blue-block">
+                    <div class="item-icon">
+                        <img src="./xg/mountain.png" alt="简">
+                    </div>
+                    <div class="item-title">个人简介</div>
+                    <div class="item-desc">
+                        <b>❤️丨王涛涛丨年龄：31岁丨毕业院校：河北美术学院-视觉传达艺术设计专业（本科）</b><br>
+                        <b>🤝丨求职意向：高级UI设计师🦁丨期望薪资：💴面议</b>
+                    </div>
+                </div>
+            </div>
+            <!-- 模块2-->
+            <div class="accordion-item item4" onclick="window.location.href='zhongjiao.html'">
+                <div class="blue-block">
+                    <div class="item-icon">
+                        <img src="./xg/cloud.png" alt="中">
+                    </div>
+                    <div class="item-title">中教领航</div>
+                    <div class="item-desc">
+                        <b>2024-2026</b><br>
+                        教育在线旗下职业教育板块：北京中教领航云科技有限公司（职业教育-产教融合/“新双高”）<br>工作职责：担任UI设计师，负责公司PC端/移动端/智能终端/数据可视化大屏/管理后台/展会宣传物料等设计工作。
+                    </div>
+                </div>
+            </div>
+            <!-- 模块3 -->
+            <div class="accordion-item item3" onclick="window.location.href='xinguang.html'">
+                <div class="blue-block">
+                    <div class="item-icon">
+                        <img src="./xg/tree.png" alt="新">
+                    </div>
+                    <div class="item-title">新广视通</div>
+                    <div class="item-desc">
+                        <b>2022-2024</b><br>
+                        北京新广视通科技集团有限责任公司（数字化政务服务）<br>工作职责：担任UI设计师，负责公司PC端/移动端/智能终端/数据可视化大屏/管理后台/宣传物料等设计工作。
+                    </div>
+                </div>
+            </div>
+            <!-- 模块4 -->
+            <div class="accordion-item item2" onclick="window.location.href='faxuan.html'">
+                <div class="blue-block">
+                    <div class="item-icon">
+                        <img src="./xg/lake.png" alt="法">
+                    </div>
+                    <div class="item-title">法宣在线</div>
+                    <div class="item-desc">
+                        <b>2016-2022</b><br>
+                        人人律集团旗下：北京法宣在线科技有限公司丨北京人人律智能大数据科技有限公司丨中版北斗物联网技术公司等子公司<br>工作职责：担任UI设计师，负责公司PC端/移动端/智能终端/数据可视化大屏/管理后台/展会宣传物料等设计工作。
+                    </div>
+                </div>
+            </div>
+            <!-- 模块5-->
+            <div class="accordion-item item5" onclick="window.location.href='Create.html'">
+                <div class="blue-block">
+                    <div class="item-icon">
+                        <img src="./xg/star.png" alt="创">
+                    </div>
+                    <div class="item-title">其他作品</div>
+                    <div class="item-desc">
+                        社区平台设计分享与交流学习，紧跟行业前沿设计趋势，持续积累实战经验。<br>在不断探索与实践中，全面提升个人专业设计能力与综合审美素养，实现个人能力的稳步成长与突破！
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+      <script>
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault(); 
+
+            
+        });
+
+
+        document.addEventListener('dragstart', function(e) {
+            if (e.target.tagName === 'IMG' || e.target.classList.contains('accordion-item')) {
+                e.preventDefault();
+            }
+        });
+
+
+        document.addEventListener('keydown', function(e) {
+
+            if (e.key === 'F12') {
+                e.preventDefault();
+            }
+
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                
+            }
+
+            if (e.ctrlKey && e.key === 'u') {
+                e.preventDefault();
+            }
+        });
+
+
+        function addImageWatermark(imgSelector, watermarkText) {
+            const imgs = document.querySelectorAll(imgSelector);
+            imgs.forEach(img => {
+
+                const watermarkDiv = document.createElement('div');
+                watermarkDiv.className = 'watermark';
+                watermarkDiv.style.position = 'absolute';
+                watermarkDiv.style.top = '0';
+                watermarkDiv.style.left = '0';
+                watermarkDiv.style.width = '100%';
+                watermarkDiv.style.height = '100%';
+                watermarkDiv.style.pointerEvents = 'none';
+                watermarkDiv.style.zIndex = '2';
+                watermarkDiv.style.fontSize = '20px';
+                watermarkDiv.style.color = 'rgba(255,255,255,0.2)';
+                watermarkDiv.style.transform = 'rotate(-45deg)';
+                watermarkDiv.innerHTML = `<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);white-space:nowrap;">${watermarkText}</div>`;
+                
+
+                const parent = img.parentElement;
+                parent.style.position = 'relative';
+
+                parent.appendChild(watermarkDiv);
+            });
+        }
+    </script>
+
+</body>
+</html>
