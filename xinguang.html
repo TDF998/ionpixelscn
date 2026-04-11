@@ -393,41 +393,71 @@
     let currentIndex = 0;
     const mainImg = document.getElementById("mainImg");
     const thumbContainer = document.getElementById("thumbContainer");
-    let thumbItems = []; 
+    let thumbItems = [];
+    let observer = null;  // 用于懒加载的观察者
 
-    
     window.onload = initImageViewer;
 
-  
     function initImageViewer() {
         generateThumbItems(); 
-        updateMainImg();      
+        updateMainImg();     
     }
 
-
+    // 生成缩略图（带懒加载）
     function generateThumbItems() {
-        
         thumbContainer.innerHTML = "";
+        thumbItems = [];
         
-        
+        // 如果之前有 observer，先断开
+        if (observer) {
+            observer.disconnect();
+        }
+
         imgList.forEach((imgSrc, index) => {
-            
             const thumbItem = document.createElement("div");
             thumbItem.className = `thumb-item ${index === 0 ? "active" : ""}`; 
             thumbItem.onclick = () => showImg(index); 
-            
-            
+
             const thumbImg = document.createElement("img");
-            thumbImg.src = imgSrc;
+            // 关键改动：用 data-src 代替 src，图片不立即加载
+            thumbImg.dataset.src = imgSrc;
             thumbImg.alt = `缩略图${index + 1}`;
             thumbImg.className = "thumb-img";
             
-           
             thumbItem.appendChild(thumbImg);
             thumbContainer.appendChild(thumbItem);
-            
-
             thumbItems.push(thumbItem);
+        });
+        
+        // 启动懒加载监听
+        initLazyLoad();
+    }
+
+    // 容器内懒加载（解决固定高度容器的问题）
+    function initLazyLoad() {
+        const container = document.getElementById("thumbContainer");
+        
+        observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset && img.dataset.src && !img.src) {
+                        img.src = img.dataset.src;
+                        img.removeAttribute('data-src');
+                    }
+                    observer.unobserve(img);
+                }
+            });
+        }, {
+            root: container,        // 监听容器内部滚动，而不是页面滚动
+            rootMargin: "50px",     // 提前50px开始加载，体验更流畅
+            threshold: 0.01
+        });
+        
+        // 监听所有缩略图
+        const thumbImgs = document.querySelectorAll("#thumbContainer .thumb-img");
+        thumbImgs.forEach(img => {
+            observer.observe(img);
         });
     }
 
